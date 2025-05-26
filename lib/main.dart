@@ -11,10 +11,13 @@ class PetReminderApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pet Reminder',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+
+        useMaterial3: true,
+        // primarySwatch: Colors.teal,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey)
       ),
       home: HomePage(),
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
     );
   }
 }
