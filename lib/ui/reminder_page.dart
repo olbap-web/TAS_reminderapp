@@ -114,7 +114,7 @@
 // }
 //___________________-
 
-// lib/ui/reminder_page.dart
+// // lib/ui/reminder_page.dart
 import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../service/reminder_service.dart';
@@ -126,7 +126,7 @@ class ReminderPage extends StatelessWidget {
 
 
 
-  // ignore: slash_for_doc_comments
+  ////ignore: slash_for_doc_comments
   /**
    * List String<> veterinarias = Arrays.asList(
     "Dr. Pet",
@@ -176,5 +176,100 @@ class ReminderPage extends StatelessWidget {
   }
 }
 
+
+
+// // lib/ui/reminder_page.dart
+// import 'package:flutter/material.dart';
+// // import 'package:intl/intl.dart';
+// // import 'package:uuid/uuid.dart';
+// import '../models/reminder.dart';
+// import '../service/reminder_service.dart';
+
+// class ReminderPage extends StatefulWidget {
+//   @override
+//   _ReminderPageState createState() => _ReminderPageState();
+// }
+
+// class _ReminderPageState extends State<ReminderPage> {
+//   final ReminderService _reminderService = ReminderService();
+//   String _filter = 'all';
+
+//   void _addReminder() {
+//     final now = DateTime.now();
+//     final newReminder = Reminder(
+//       id: Uuid().v4(),
+//       title: 'Nuevo recordatorio',
+//       time: now.add(Duration(days: 3)),
+//       completed: false,
+//     );
+
+//     setState(() {
+//       _reminderService.addReminder(newReminder);
+//     });
+//   }
+
+//   void _toggleReminder(String id) {
+//     setState(() {
+//       _reminderService.toggleReminder(id);
+//     });
+//   }
+
+//   void _changeFilter(String filter) {
+//     setState(() {
+//       _filter = filter;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final reminders = _reminderService.getReminders(filter: _filter);
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Recordatorios'),
+//         actions: [
+//           PopupMenuButton<String>(
+//             onSelected: _changeFilter,
+//             icon: Icon(Icons.filter_list),
+//             itemBuilder: (context) => [
+//               PopupMenuItem(value: 'all', child: Text('Todos')),
+//               PopupMenuItem(value: 'pending', child: Text('Pendientes')),
+//               PopupMenuItem(value: 'completed', child: Text('Completados')),
+//             ],
+//           ),
+//         ],
+//       ),
+//       body: ListView.builder(
+//         itemCount: reminders.length,
+//         itemBuilder: (context, index) {
+//           final reminder = reminders[index];
+//           return Card(
+//             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//             child: ListTile(
+//               leading: Icon(
+//                 reminder.completed ? Icons.check_circle : Icons.access_time,
+//                 color: reminder.completed ? Colors.green : Colors.orange,
+//               ),
+//               title: Text(reminder.title),
+//               subtitle: Text(
+//                 'Fecha: ${DateFormat('dd/MM/yyyy').format(reminder.time)}',
+//               ),
+//               trailing: IconButton(
+//                 icon: Icon(Icons.check),
+//                 color: reminder.completed ? Colors.grey : Colors.blue,
+//                 onPressed: () => _toggleReminder(reminder.id),
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         onPressed: _addReminder,
+//         child: Icon(Icons.add),
+//         tooltip: 'Agregar recordatorio',
+//       ),
+//     );
+//   }
+// }
 
 
