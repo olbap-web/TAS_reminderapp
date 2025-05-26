@@ -1,6 +1,6 @@
 import 'package:pet_remainder_app/models/control.dart';
 
-import '../models/control.dart';
+// import '../models/control.dart';
 
 class ControlService {
   static final List<Control> _controls = [
@@ -11,7 +11,7 @@ class ControlService {
 
   static List<Control> getAllControls() => _controls;
 
-  static Control? getPetById(int id) =>
+  static Control? getDoctorById(int id) =>
       _controls.firstWhere((pet) => pet.id == id, orElse: () => Control(id: 2,doctor: 'Monserrat Bustamante op 5', estado: 'Pendiente', fecha: '2025-05-26' ));
 }
 
