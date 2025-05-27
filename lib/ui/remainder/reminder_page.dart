@@ -116,8 +116,8 @@
 
 // // lib/ui/reminder_page.dart
 import 'package:flutter/material.dart';
-import '../models/reminder.dart';
-import '../service/reminder_service.dart';
+import '../../models/reminder.dart';
+import '../../service/reminder_service.dart';
 // ignore: depend_on_referenced_packages
 // import 'package:intl/intl.dart';
 

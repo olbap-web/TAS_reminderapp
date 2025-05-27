@@ -58,7 +58,7 @@
 
 import 'package:flutter/material.dart';
 import '../models/pet.dart';
-import 'reminder_page.dart';
+import 'remainder/reminder_page.dart';
 
 class PetProfilePage extends StatelessWidget {
   final Pet pet;
