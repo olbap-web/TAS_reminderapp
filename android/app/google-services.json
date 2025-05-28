@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "638227232730",
+    "project_id": "vetcompanion-e0b9b",
+    "storage_bucket": "vetcompanion-e0b9b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638227232730:android:64bbc9cd602691a137f2e3",
+        "android_client_info": {
+          "package_name": "com.example.pet_remainder_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAZX35LBPMCO2zXqyekoLzuECn3yiCN6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

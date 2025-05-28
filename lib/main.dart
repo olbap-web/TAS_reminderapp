@@ -38,7 +38,7 @@ class PetReminderApp extends StatelessWidget {
       valueListenable: themeNotifier,
       builder: (_, ThemeMode currentMode, __) {
         return MaterialApp(
-          title: 'Pet Reminder',
+          title: 'VetCompanion',
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
