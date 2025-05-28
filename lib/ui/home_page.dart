@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isDrawerLeft = true;
+  bool isDrawerLeft = false;
   bool get isDarkMode => PetReminderApp.themeNotifier.value == ThemeMode.dark;
 
   final List<Map<String, dynamic>> drawerItems = [];
