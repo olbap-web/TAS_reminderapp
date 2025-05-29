@@ -4,8 +4,13 @@ import 'package:pet_remainder_app/models/pet.dart';
 import 'package:pet_remainder_app/service/pet_service.dart';
 import 'package:pet_remainder_app/ui/control_medico/control_medico_page.dart';
 import 'package:pet_remainder_app/ui/treatment/treatment_page.dart';
-import 'pet_profile_page.dart';
+// import 'pet_profile_page.dart';
 import 'remainder/reminder_page.dart';
+
+import 'package:flutter/material.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:permission_handler/permission_handler.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,9 +26,18 @@ class _HomePageState extends State<HomePage> {
   List<Pet> pets = [];
   Pet? selectedPet;
 
+  // void requestNotificationPermission() async {
+  //   if (await Permission.notification.isDenied) {
+  //     await Permission.notification.request();
+  //   }
+  // }
   @override
   void initState() {
     super.initState();
+
+    // requestNotificationPermission();
+
+    
     pets = PetService.getAllPets();
     if (pets.isNotEmpty) selectedPet = pets.first;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// import 'package:pet_remainder_app/service/notification_service.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../models/reminder.dart';
@@ -21,9 +22,10 @@ class _AddReminderPageState extends State<AddReminderPage> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime.now(),
+      firstDate: DateTime.now(), // solo fechas desde hoy
       lastDate: DateTime(2100),
     );
+
     if (pickedDate != null) {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
@@ -59,9 +61,17 @@ class _AddReminderPageState extends State<AddReminderPage> {
       completed: false,
     );
 
+    // Programar notificación
+    // NotificationService.showScheduledNotification(
+    //   id: newReminder.hashCode,
+    //   title: 'Recordatorio: ${newReminder.title}',
+    //   body: '¡Es hora de atender este recordatorio!',
+    //   scheduledDate: newReminder.time,
+    // );
+
     widget.onAdd(newReminder);
-    // No es necesario hacer Navigator.pop aquí porque lo hace ReminderPage después
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +92,12 @@ class _AddReminderPageState extends State<AddReminderPage> {
             SizedBox(height: 20),
             Row(
               children: [
-                Text('Fecha y hora: $formattedDate'),
-                Spacer(),
+                Expanded(
+                  child: Text(
+                    'Fecha y hora: $formattedDate',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: _selectDate,
                   child: Text('Seleccionar'),
@@ -95,6 +109,9 @@ class _AddReminderPageState extends State<AddReminderPage> {
               onPressed: _saveReminder,
               icon: Icon(Icons.save),
               label: Text('Guardar'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 48),
+              ),
             ),
           ],
         ),
