@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
               items: pets.map((Pet pet) {
                 return DropdownMenuItem<Pet>(
                   value: pet,
-                  child: Text(pet.nombre),
+                  child: Text("Nombre: ${pet.nombre} - ${pet.especie}"),
                 );
               }).toList(),
             ),
