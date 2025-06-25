@@ -1,5 +1,8 @@
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_remainder_app/ui/auth_gate.dart';
+import 'package:pet_remainder_app/ui/login_page.dart';
 import 'ui/home_page.dart';
 
 
@@ -20,6 +23,12 @@ void main() async {
 
   // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  
+  await Firebase.initializeApp(); // Agrega esto
+
   runApp(PetReminderApp());
 }
 
@@ -39,7 +48,7 @@ class PetReminderApp extends StatelessWidget {
           ),
           darkTheme: ThemeData.dark(),
           themeMode: currentMode,
-          home: HomePage(),
+          home: AuthGate(),
           debugShowCheckedModeBanner: false,
         );
       },

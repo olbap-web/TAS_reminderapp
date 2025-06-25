@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pet_remainder_app/main.dart';
 import 'package:pet_remainder_app/models/pet.dart';
 import 'package:pet_remainder_app/service/pet_service.dart';
@@ -79,7 +82,10 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.logout,
         'title': 'Cerrar sesión',
-        'action': () {
+        'action': () async {
+          await FirebaseAuth.instance.signOut();
+          await GoogleSignIn().signOut();
+          await FlutterSecureStorage().delete(key: 'jwt');
           Navigator.pop(context);
         },
       },
