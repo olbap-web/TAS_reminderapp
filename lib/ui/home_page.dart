@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,8 +9,10 @@ import 'package:pet_remainder_app/models/pet.dart';
 import 'package:pet_remainder_app/service/pet_service.dart';
 import 'package:pet_remainder_app/ui/control_medico/control_medico_page.dart';
 import 'package:pet_remainder_app/ui/treatment/treatment_page.dart';
-// import 'pet_profile_page.dart';
+import 'user/register_page.dart';
 import 'remainder/reminder_page.dart';
+
+import 'package:pet_remainder_app/service/user_service.dart';
 
 import 'package:flutter/material.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -29,6 +33,10 @@ class _HomePageState extends State<HomePage> {
   List<Pet> pets = [];
   Pet? selectedPet;
 
+
+  final user = FirebaseAuth.instance.currentUser;
+    
+
   // void requestNotificationPermission() async {
   //   if (await Permission.notification.isDenied) {
   //     await Permission.notification.request();
@@ -38,61 +46,44 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+
+
     // requestNotificationPermission();
+
+    if(user == null){
+      //RETORNAR A LOGIN
+      FirebaseAuth.instance.signOut();
+      GoogleSignIn().signOut();
+      FlutterSecureStorage().delete(key: 'jwt');
+    }else if (user!.email != null){
+      getPersonaByEmail(user!.email!);
+    }
 
     
     pets = PetService.getAllPets();
     if (pets.isNotEmpty) selectedPet = pets.first;
 
-    drawerItems.addAll([
-      {
-        'icon': Icons.alarm,
-        'title': 'Recordatorios',
-        'action': () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ReminderPage()),
-            ),
-      },
-      {
-        'icon': Icons.medical_services,
-        'title': 'Tratamientos',
-        'action': () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TratamientoPage()),
-            ),
-      },
-      {
-        'icon': Icons.event_note,
-        'title': 'Eventos Médicos',
-        'action': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ControlMedicoPage(idMascota: selectedPet?.id ?? 0)),
-            ),
-      },
-      {
-        'icon': Icons.brightness_6,
-        'title': () => isDarkMode ? 'Modo Claro' : 'Modo Oscuro',
-        'action': () {
-          PetReminderApp.themeNotifier.value =
-              isDarkMode ? ThemeMode.light : ThemeMode.dark;
-          Navigator.pop(context);
-        },
-      },
-      {
-        'icon': Icons.logout,
-        'title': 'Cerrar sesión',
-        'action': () async {
-          await FirebaseAuth.instance.signOut();
-          await GoogleSignIn().signOut();
-          await FlutterSecureStorage().delete(key: 'jwt');
-          Navigator.pop(context);
-        },
-      },
-    ]);
+    
+  }
+  Future<void> getPersonaByEmail(String email) async {
+    final userData = await UserService().getPersonaByEmail(email);
+
+    if (userData != null) {
+      print("Datos desde BFF: $userData");
+      final storage = FlutterSecureStorage();
+      await storage.write(key: 'user_data', value: jsonEncode(userData));
+    } else {
+      // Redirigir al formulario de registro
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RegisterPage()),
+        );
+      });
+    }
   }
 
-  Widget buildDrawerContent() {
+  Widget buildDrawerContent(dynamic user) {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -101,22 +92,54 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(Icons.pets, size: 40, color: Colors.white),
-              SizedBox(height: 10),
-              Text('Home', style: TextStyle(color: Colors.white, fontSize: 20)),
+              if (user.photoURL != null)
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: NetworkImage(user.photoURL!),
+              ),
+              // Icon(Icons.pets, size: 40, color: Colors.white),
+              SizedBox(height: 20),
+              Text(user.displayName ?? "Sin nombre", style: TextStyle(color: Colors.white, fontSize: 20)),
             ],
           ),
         ),
-        ...drawerItems.map((item) {
-          final icon = item['icon'];
-          final title = item['title'];
-          final action = item['action'];
-          return ListTile(
-            leading: Icon(icon),
-            title: Text(title is Function ? title() : title),
-            onTap: action,
-          );
-        }).toList(),
+        ListTile(
+          leading: Icon(Icons.pets),
+          title: Text('Mis Compañeros'),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ReminderPage()));
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.alarm),
+          title: Text('Recordatorios'),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ReminderPage()));
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.medical_services),
+          title: Text('Tratamientos'),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TratamientoPage()));
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.event_note),
+          title: Text('Eventos Médicos'),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ControlMedicoPage(idMascota: selectedPet?.id ?? 0)));
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.brightness_6),
+          title: Text(isDarkMode ? 'Modo Claro' : 'Modo Oscuro'),
+          onTap: () {
+            PetReminderApp.themeNotifier.value = isDarkMode ? ThemeMode.light : ThemeMode.dark;
+            Navigator.pop(context);
+          },
+        ),
         Divider(),
         ListTile(
           leading: Icon(Icons.swap_horiz),
@@ -126,10 +149,23 @@ class _HomePageState extends State<HomePage> {
               isDrawerLeft = !isDrawerLeft;
             });
           },
+          
+        ),
+        ListTile(
+          leading: Icon(Icons.logout),
+          title: Text('Cerrar sesión'),
+          onTap: () async {
+            await FirebaseAuth.instance.signOut();
+            await GoogleSignIn().signOut();
+            await FlutterSecureStorage().delete(key: 'jwt');
+            Navigator.pop(context);
+          },
+          
         ),
       ],
     );
   }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -137,41 +173,15 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('VetCompanion'),
       ),
-      drawer: isDrawerLeft ? Drawer(child: buildDrawerContent()) : null,
-      endDrawer: !isDrawerLeft ? Drawer(child: buildDrawerContent()) : null,
+      drawer: isDrawerLeft ? Drawer(child: buildDrawerContent(user)) : null,
+      endDrawer: !isDrawerLeft ? Drawer(child: buildDrawerContent(user)) : null,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Selecciona una mascota:", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            DropdownButton<Pet>(
-              value: selectedPet,
-              hint: Text('Elige una mascota'),
-              isExpanded: true,
-              onChanged: (Pet? newPet) {
-                setState(() {
-                  selectedPet = newPet;
-                });
-              },
-              items: pets.map((Pet pet) {
-                return DropdownMenuItem<Pet>(
-                  value: pet,
-                  child: Text("Nombre: ${pet.nombre} - ${pet.especie}"),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 20),
-            if (selectedPet != null) ...[
-              Text("Información del perfil:",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Text("Nombre: ${selectedPet!.nombre}"),
-              Text("Especie: ${selectedPet!.especie}"),
-              Text("Raza: ${selectedPet!.raza}"),
-              Text("Fecha de nacimiento: ${selectedPet!.fechaNacimiento.toLocal().toString().split(' ')[0]}"),
-            ],
+            
             Divider(),
             SizedBox(height: 20),
 

@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _loading = false;
         });
-        return; // El usuario canceló
+        return; 
       }
 
       final GoogleSignInAuthentication googleAuth =
@@ -42,9 +42,12 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
+      print('Access-token ${googleAuth.accessToken}');
+      print('id-token ${googleAuth.idToken}');
+
+
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Enviar el ID token al BFF
       final idToken = googleAuth.idToken;
       final jwt = await _getJwtFromBackend(idToken!);
 
@@ -72,13 +75,14 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<String?> _getJwtFromBackend(String idToken) async {
     final response = await http.post(
-      Uri.parse('https://tu-backend.com/api/auth/google'), // ⚠️ cambia esto
+      Uri.parse('https://bff-vetcompanion-218357869562.us-east1.run.app/api'), 
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'idToken': idToken}),
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data['jwt']);
       return data['jwt'];
     } else {
       print("Error BFF: ${response.body}");

@@ -1,9 +1,21 @@
+buildscript {
+    dependencies {
+        classpath("com.google.gms:google-services:4.3.15")
+        // otras dependencias
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
 }
+
 
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
 rootProject.layout.buildDirectory.value(newBuildDir)

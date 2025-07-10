@@ -1,34 +1,22 @@
 
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_remainder_app/ui/auth_gate.dart';
 import 'package:pet_remainder_app/ui/login_page.dart';
 import 'ui/home_page.dart';
 
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializa la zona horaria
-  // tz.initializeTimeZones();
-  // tz.setLocalLocation(tz.getLocation('America/Santiago')); // Ajusta según tu país
-
-  // // Inicializa las notificaciones
-  // const AndroidInitializationSettings initializationSettingsAndroid =
-  //     AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  // final InitializationSettings initializationSettings = InitializationSettings(
-  //   android: initializationSettingsAndroid,
-  // );
-
-  // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-
-  WidgetsFlutterBinding.ensureInitialized();
-
-  
-  await Firebase.initializeApp(); // Agrega esto
-
+  print("Iniciando Firebase...");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  print("Firebase inicializado correctamente");
   runApp(PetReminderApp());
 }
 
