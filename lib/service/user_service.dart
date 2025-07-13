@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class UserService {
-  final String baseUrl = 'https://bff-vetcompanion-218357869562.us-east1.run.app/api'; // ⬅️ tu URL real
+  final String baseUrl = 'https://bff-vetcompanion-218357869562.us-east1.run.app/api/secure'; // ⬅️ tu URL real
 
   Future<Map<String, dynamic>?> getUserFromBFF(String email) async {
     final user = FirebaseAuth.instance.currentUser;

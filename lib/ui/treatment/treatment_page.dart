@@ -17,7 +17,7 @@ class _TratamientoPageState extends State<TratamientoPage> {
   final petService = PetService();
 
   // Mascotas simuladas
-  final List<Pet> mascotas = PetService.getAllPets();
+  final List<Pet> mascotas = [];
 
   Pet? mascotaSeleccionada;
   List<Tratamiento> tratamientos = [];

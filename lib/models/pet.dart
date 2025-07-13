@@ -15,14 +15,14 @@
 class Pet {
   final int id;
   final String nombre;
-  final String especie;
+  final String tipo_mascota;
   final String raza;
   final DateTime fechaNacimiento;
 
   Pet({
     required this.id,
     required this.nombre,
-    required this.especie,
+    required this.tipo_mascota,
     required this.raza,
     required this.fechaNacimiento,
   });

@@ -4,7 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'user/register_page.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,6 +18,23 @@ class _LoginPageState extends State<LoginPage> {
   final _secureStorage = FlutterSecureStorage();
   bool _loading = false;
   String? _error;
+  Future<bool> _checkUserExistsInBackend(String email, String idToken) async {
+    final response = await http.get(
+      Uri.parse('https://bff-vetcompanion-218357869562.us-east1.run.app/api/secure/user?email=$email'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else if (response.statusCode == 404) {
+      return false;
+    } else {
+      throw Exception('Error al verificar usuario: ${response.body}');
+    }
+  }
+
 
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -31,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _loading = false;
         });
-        return; 
+        return;
       }
 
       final GoogleSignInAuthentication googleAuth =
@@ -42,21 +59,44 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
-      print('Access-token ${googleAuth.accessToken}');
-      print('id-token ${googleAuth.idToken}');
-
-
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      final idToken = googleAuth.idToken;
-      final jwt = await _getJwtFromBackend(idToken!);
+      final user = FirebaseAuth.instance.currentUser;
+      final idToken = await user?.getIdToken();
+
+      if (idToken == null || user == null) {
+        setState(() {
+          _error = "Error al obtener token de autenticación";
+          _loading = false;
+        });
+        return;
+      }
+
+      final jwt = await _getJwtFromBackend(idToken);
 
       if (jwt != null) {
         await _secureStorage.write(key: 'jwt', value: jwt);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => HomePage()),
-        );
+
+        final exists = await _checkUserExistsInBackend(user.email!, idToken);
+
+        if (exists) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => HomePage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Completa tu registro antes de continuar.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => RegisterPage()),
+          );
+        }
       } else {
         setState(() {
           _error = "Error al autenticar con el backend";

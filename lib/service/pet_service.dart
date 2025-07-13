@@ -1,49 +1,61 @@
-// // servicios/mascota_service.dart
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-
-// class Mascota {
-//   final int id;
-//   final String nombre;
-//   final String especie;
-
-//   Mascota({required this.id, required this.nombre, required this.especie});
-
-//   factory Mascota.fromJson(Map<String, dynamic> json) {
-//     return Mascota(
-//       id: json['id'],
-//       nombre: json['nombre'],
-//       especie: json['especie'],
-//     );
-//   }
-// }
-
-// class MascotaService {
-//   final String baseUrl = 'http://tu-servidor:puerto/api/mascotas';
-
-//   Future<List<Mascota>> obtenerMascotas() async {
-//     final respuesta = await http.get(Uri.parse(baseUrl));
-
-//     if (respuesta.statusCode == 200) {
-//       List jsonResponse = json.decode(respuesta.body);
-//       return jsonResponse.map((e) => Mascota.fromJson(e)).toList();
-//     } else {
-//       throw Exception('Error al cargar mascotas');
-//     }
-//   }
-// }
-
-import '../models/pet.dart';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 
 class PetService {
-  static final List<Pet> _pets = [
-    Pet(id: 1, nombre: 'Firulais', especie: 'Perro', raza: 'Labrador', fechaNacimiento: DateTime(2020, 3, 10)),
-    Pet(id: 2, nombre: 'Misu', especie: 'Gato', raza: 'Siames', fechaNacimiento: DateTime(2021, 5, 18)),
-    Pet(id: 3, nombre: 'Rocky', especie: 'Perro', raza: 'Bulldog', fechaNacimiento: DateTime(2019, 1, 5)),
-  ];
+  final String baseUrl =
+      'https://bff-vetcompanion-218357869562.us-east1.run.app/api/secure';
 
-  static List<Pet> getAllPets() => _pets;
+  Future<List<Map<String, dynamic>>> getPetsByFamilyGroup(String groupId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await user?.getIdToken();
 
-  static Pet? getPetById(int id) =>
-      _pets.firstWhere((pet) => pet.id == id, orElse: () => Pet(id: id, nombre: 'sas', especie: 'especie', raza: 'raza', fechaNacimiento: DateTime(DateTime.now().year)));
+    final response = await http.get(
+      Uri.parse('$baseUrl/pet/family-group?id=$groupId'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      print("Error al obtener mascotas: ${response.body}");
+      return [];
+    }
+  }
+
+  Future<bool> createPet({
+    required String idGrupoFamiliar,
+    required String nombre,
+    required int fechaNacimiento, 
+    required String tipoMascota,
+    required String sexo,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await user?.getIdToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/pet'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'id_grupo_familiar': idGrupoFamiliar,
+        'nombre': nombre,
+        'fecha_nacimiento': fechaNacimiento,
+        'tipo_mascota': tipoMascota,
+        'sexo': sexo,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      print("Error al crear mascota: ${response.body}");
+      return false;
+    }
+  }
 }

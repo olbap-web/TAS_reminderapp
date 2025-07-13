@@ -61,22 +61,22 @@ import '../models/pet.dart';
 import 'remainder/reminder_page.dart';
 
 class PetProfilePage extends StatelessWidget {
-  final Pet pet;
+  final dynamic pet;
 
   const PetProfilePage({required this.pet});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(pet.nombre)),
+      appBar: AppBar(title: Text(pet['nombre'])),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Especie: ${pet.especie}', style: TextStyle(fontSize: 18)),
-            Text('Raza: ${pet.raza}', style: TextStyle(fontSize: 18)),
-            Text('Fecha de nacimiento: ${pet.fechaNacimiento.toLocal().toString().split(' ')[0]}', style: TextStyle(fontSize: 18)),
+            Text('Especie: ${pet['tipo_mascota']}', style: TextStyle(fontSize: 18)),
+            Text('Sexo: ${pet['sexo']}', style: TextStyle(fontSize: 18)),
+            Text('Fecha de nacimiento: ${pet['fecha_nacimiento']}', style: TextStyle(fontSize: 18)),
             SizedBox(height: 20),
             ElevatedButton(
               child: Text('Ver recordatorios'),
