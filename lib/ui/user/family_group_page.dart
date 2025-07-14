@@ -94,7 +94,7 @@ class _FamilyGroupManagerPageState extends State<FamilyGroupManagerPage> {
             onPressed: () async {
               final userData = await storage.read(key: 'user_data');
               if (userData != null) {
-                final persona = jsonDecode(userData);
+                // final persona = jsonDecode(userData);
                 await fgService.leaveFamilyGroup(
                   groupId: group['id'].toString(),
                 );

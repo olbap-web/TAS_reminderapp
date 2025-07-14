@@ -1,4 +1,3 @@
-// home_page.dart
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +7,6 @@ import 'package:pet_remainder_app/main.dart';
 import 'package:pet_remainder_app/service/family_group_service.dart';
 import 'package:pet_remainder_app/service/pet_service.dart';
 import 'package:pet_remainder_app/service/user_service.dart';
-import 'package:pet_remainder_app/ui/control_medico/control_medico_page.dart';
-import 'package:pet_remainder_app/ui/treatment/treatment_page.dart';
 import 'package:pet_remainder_app/ui/user/family_group_page.dart';
 import 'package:pet_remainder_app/ui/user/register_page.dart';
 import 'package:pet_remainder_app/ui/remainder/reminder_page.dart';
@@ -122,38 +119,26 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        ListTile(
-          leading: Icon(Icons.pets),
-          title: Text('Mis Compañeros'),
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => ReminderPage()));
-          },
-        ),
+        // ListTile(
+        //   leading: Icon(Icons.pets),
+        //   title: Text('Mis Compañeros'),
+        //   onTap: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (_) => ReminderPage()),
+        //     ).then((_) => _loadUserData());
+        //   },
+        // ),
         ListTile(
           leading: Icon(Icons.alarm),
           title: Text('Recordatorios'),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => ReminderPage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ReminderPage()),
+            ).then((_) => _loadUserData());
           },
         ),
-        // ListTile(
-        //   leading: Icon(Icons.medical_services),
-        //   title: Text('Tratamientos'),
-        //   onTap: () {
-        //     Navigator.push(context, MaterialPageRoute(builder: (_) => TratamientoPage()));
-        //   },
-        // ),
-        // ListTile(
-        //   leading: Icon(Icons.event_note),
-        //   title: Text('Eventos Médicos'),
-        //   onTap: () {
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (_) => ControlMedicoPage(idMascota: 0)),
-        //     );
-        //   },
-        // ),
-        
         Divider(),
         ListTile(
           leading: Icon(Icons.swap_horiz),
@@ -285,6 +270,10 @@ class _HomePageState extends State<HomePage> {
 
               if (success) {
                 Navigator.pop(context);
+                _nombreController.clear();
+                _tipoController.clear();
+                _sexoController.clear();
+                _fechaNacimiento = null;
                 _loadPetsByGroup(selectedFamilyGroup['id']);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -323,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => PetProfilePage(pet: pet)),
-                  );
+                  ).then((_) => _loadUserData());
                 },
               ),
             );
@@ -374,7 +363,7 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => FamilyGroupManagerPage()),
-          );
+          ).then((_) => _loadUserData());
         },
         child: Icon(Icons.group_add),
         tooltip: "Agregar grupo familiar",

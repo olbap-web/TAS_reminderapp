@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'user/register_page.dart';
 import 'home_page.dart';
 
@@ -15,7 +14,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _secureStorage = FlutterSecureStorage();
+  // final _secureStorage = FlutterSecureStorage();
   bool _loading = false;
   String? _error;
   Future<bool> _checkUserExistsInBackend(String email, String idToken) async {
@@ -72,35 +71,37 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      final jwt = await _getJwtFromBackend(idToken);
+      // final jwt = await _getJwtFromBackend(idToken);
 
-      if (jwt != null) {
-        await _secureStorage.write(key: 'jwt', value: jwt);
+      // if (jwt != null) {
+      //   await _secureStorage.write(key: 'jwt', value: jwt);
 
-        final exists = await _checkUserExistsInBackend(user.email!, idToken);
+        
+      // } else {
+      //   setState(() {
+      //     _error = "Error al autenticar con el backend";
+      //   });
+      // }
 
-        if (exists) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => HomePage()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Completa tu registro antes de continuar.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
+      final exists = await _checkUserExistsInBackend(user.email!, idToken);
 
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => RegisterPage()),
-          );
-        }
+      if (exists) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => HomePage()),
+        );
       } else {
-        setState(() {
-          _error = "Error al autenticar con el backend";
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Completa tu registro antes de continuar.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => RegisterPage()),
+        );
       }
     } catch (e) {
       setState(() {
@@ -113,22 +114,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<String?> _getJwtFromBackend(String idToken) async {
-    final response = await http.post(
-      Uri.parse('https://bff-vetcompanion-218357869562.us-east1.run.app/api'), 
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'idToken': idToken}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print(data['jwt']);
-      return data['jwt'];
-    } else {
-      print("Error BFF: ${response.body}");
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

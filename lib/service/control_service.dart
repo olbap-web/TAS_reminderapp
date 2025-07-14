@@ -1,34 +1,95 @@
-import 'package:pet_remainder_app/models/control.dart';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
-// import '../models/control.dart';
+class MedicalCtrlService {
+  final String baseUrl = 'https://bff-vetcompanion-218357869562.us-east1.run.app/api/secure';
+  final _storage = const FlutterSecureStorage();
 
-// class ControlService {
-//   static final List<Control> _controls = [
-//     Control(id: 1,doctor: 'Monserrat Bustamante op 1', estado: 'Activa', fecha: '2025-05-26' , mascota: '1'),
-//     Control(id: 2,doctor: 'Monserrat Bustamante op 2', estado: 'Pendiente', fecha: '2025-05-26' , mascota: '1'),
-//     Control(id: 3,doctor: 'Monserrat Bustamante op 3', estado: 'Pendiente', fecha: '2025-05-26', mascota: '1' ),
-//   ];
+  Future<List<Map<String, dynamic>>> getMedicalCtrlsByPet(String petId) async {
+    final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
 
-//   static List<Control> getAllControls() => _controls;
+    final response = await http.get(
+      Uri.parse('$baseUrl/medical-ctrl/pet?id=$petId'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
 
-//   static Control? getDoctorById(int id) =>
-//       _controls.firstWhere((pet) => pet.id == id, orElse: () => _controls[1]);
-// }
-
-class ControlMedicoService {
-  static final List<ControlMedico> _mockData = [];
-
-  Future<List<ControlMedico>> getControlesPorMascota(int idMascota) async {
-    return _mockData.where((c) => c.idMascota == idMascota).toList();
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      print("Error al obtener los controles medicos : ${response.body}");
+      return [];
+    }
   }
 
-  Future<void> agregarControl(ControlMedico control) async {
-    _mockData.add(control);
+  
+
+  /// Crear un nuevo control medico
+  Future<bool> addNewMedicalCtrl({required dynamic medical_ctrl, required String id_mascota}) async {
+    final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+    final userDataRaw = await _storage.read(key: 'user_data');
+
+    if (userDataRaw == null) {
+      print("No se encontró user_data en secure storage");
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/medical-ctrl'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "id_mascota": id_mascota,
+        "fecha_registro": medical_ctrl['fecha_registro'],
+        "fecha_control": medical_ctrl['fecha_control'],
+        "fechas_extra": medical_ctrl['fechas_extra'],
+        "estado": 1,	
+      }),
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return true;
+    } else {
+      print("Error al crear control medicor: ${response.body}");
+      return false;
+    }
   }
+  Future<bool> changeStateMedicalCtrl({required dynamic medical_ctrl}) async {
+    final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+    final userDataRaw = await _storage.read(key: 'user_data');
+
+    if (userDataRaw == null) {
+      print("No se encontró user_data en secure storage");
+      return false;
+    }
+
+    // final decoded = jsonDecode(userDataRaw);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/medical-ctrl'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "update":1,
+        "id_control": medical_ctrl['id'],
+        "estado": medical_ctrl['estado'],	
+      }),
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return true;
+    } else {
+      print("Error al crear control medicor: ${response.body}");
+      return false;
+    }
+  }
+  
 }
-
-
-
-// nombre: 'Firulais', especie: 'Perro', raza: 'Labrador', fechaNacimiento: DateTime(2020, 3, 10)
-// nombre: 'Misu', especie: 'Gato', raza: 'Siames', fechaNacimiento: DateTime(2021, 5, 18)
-// nombre: 'Rocky', especie: 'Perro', raza: 'Bulldog', fechaNacimiento: DateTime(2019, 1, 5)
